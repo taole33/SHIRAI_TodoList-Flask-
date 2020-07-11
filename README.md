@@ -1,2 +1,2 @@
 # SHIRAI_TodoList-Flask-
-##Webで動くTodoリストです
+## Webで動くTodoリストです
