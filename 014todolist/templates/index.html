@@ -13,7 +13,7 @@
         {% for entry in result %}
         <li>
             <input type="hidden" name="csrf_token" value="{{csrf_token()}}"/>
-            <input type="checkbox" name="action" value="{{entry[0]}}">{{entry[1]}}:{{entry[2]}}
+            <input type="radio" name="action" value="{{entry[0]}}">{{entry[1]}}:{{entry[2]}}
         </li>
         {% endfor %}
     </ul>
