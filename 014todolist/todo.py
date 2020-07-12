@@ -10,14 +10,21 @@ app.config['SECRET_KEY']=os.urandom(24)
 csrf=CSRFProtect(app)
 
 
-@app.route('/')
-def show_entries():
+def show_entries(input):
     con = sqlite3.connect('todo.db')
     c = con.cursor()
     c.execute("CREATE TABLE IF NOT EXISTS message(data_id,msg,date_time)")
     result = con.execute("SELECT * FROM message ORDER BY data_id DESC")
+    alert = input
+    return render_template('index.html',result=result,alert=alert)
 
-    return render_template('index.html',result=result)
+
+
+@app.route('/')
+def index_show():
+    output = show_entries('')
+    return output
+
 
 
 @app.route('/',methods=['GET','POST'])
@@ -26,12 +33,8 @@ def send():
     if request.method == 'POST':
         msg = request.form['msg']
         if not msg:
-            con = sqlite3.connect('todo.db')
-            c = con.cursor()
-            con.commit()
-            result = con.execute("SELECT * FROM message ORDER BY data_id DESC")
-            alert = 'WARNING : If you want to create new ToDo,Please enter something'
-            return render_template('index.html',alert=alert,result=result)
+            output = show_entries('WARNING : If you want to create new ToDo,Please enter something')
+            return output
         else:
             date_time = datetime.datetime.today()
             data_id = date_time.strftime("%Y%m%dH%M%S")
@@ -41,31 +44,25 @@ def send():
             con.commit()
             result = con.execute("SELECT * FROM message ORDER BY data_id DESC")
 
-    return render_template('index.html',result=result)
+            return render_template('index.html',result=result)
 
 
 @app.route('/delete_data',methods=['GET','POST'])
 def delete_data():
     if request.method == 'POST':
         data_ids = request.form.get('action')
-        print('PRINT',data_ids)
         if not data_ids:
-            con = sqlite3.connect('todo.db')
-            c = con.cursor()
-            con.commit()
-            result = con.execute("SELECT * FROM message ORDER BY data_id DESC")
-            alert = 'WARNING : If you want to delete some ToDo,you have to select some checkbox.'
-            return render_template('index.html',alert=alert,result=result)
+            output = show_entries('WARNING : If you want to delete some ToDo,you have to select some checkboxes.')
+            return output
         else:
-            con = sqlite3.connect(
-                'todo.db')
+            con = sqlite3.connect('todo.db')
             c = con.cursor()
             query = "DELETE FROM message WHERE data_id=?"
             c.execute(query,(data_ids,))
             con.commit()
             result = con.execute("SELECT * FROM message ORDER BY data_id DESC")
     
-    return render_template('index.html',result=result)
+            return render_template('index.html',result=result)
 
 
 if __name__ == '__main__':
